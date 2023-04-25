@@ -15,8 +15,8 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] AudioClip death;
 
     Rigidbody2D rigidbody;
-    float turnSpeed = 150;
-    float speed = 75;
+    [SerializeField] float turnSpeed;
+    [SerializeField] float speed;
 
     [SerializeField] GameObject bulletPrefab;
 
