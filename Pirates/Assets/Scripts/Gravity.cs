@@ -20,6 +20,7 @@ public class Gravity : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        GetComponentInParent<StarSpawner>().ScrollSpawn(gameObject);
         Collider2D[] objectsInRange = Physics2D.OverlapCircleAll(transform.position, range); //find all objects in gravitational field
 
         foreach (Collider2D collider in objectsInRange)
