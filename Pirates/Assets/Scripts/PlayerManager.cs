@@ -15,10 +15,13 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] AudioClip death;
 
     Rigidbody2D rigidbody;
-    [SerializeField] float turnSpeed;
-    [SerializeField] float speed;
 
     [SerializeField] GameObject bulletPrefab;
+
+    [Header("Adjust")]
+    [SerializeField] float turnSpeed;
+    [SerializeField] float speed;
+    [SerializeField] float dragStrength;
 
     // Start is called before the first frame update
     void Start()
@@ -44,9 +47,9 @@ public class PlayerManager : MonoBehaviour
     private void FixedUpdate()
     {
         //turn
-        //float turn = -Input.GetAxis("Horizontal") * Time.fixedDeltaTime * turnSpeed;
-        //rigidbody.rotation += turn;
-        rigidbody.velocity = Quaternion.Euler(0, 0, 40 * -Input.GetAxis("Horizontal") * Time.fixedDeltaTime) * rigidbody.velocity;
+        rigidbody.velocity = Quaternion.Euler(0, 0, turnSpeed * -Input.GetAxis("Horizontal") * Time.fixedDeltaTime) * rigidbody.velocity;
+        //add drag
+        rigidbody.AddForce(-rigidbody.velocity.normalized * rigidbody.velocity.sqrMagnitude * dragStrength);
 
         //movement force
         float force = Mathf.Max(0, Input.GetAxis("Vertical")) * Time.fixedDeltaTime * speed;

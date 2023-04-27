@@ -609,10 +609,11 @@ MonoBehaviour:
   dialogueSource: {fileID: 0}
   hit: {fileID: 0}
   death: {fileID: 0}
-  turnSpeed: 150
-  speed: 50
   bulletPrefab: {fileID: 6601250750538448139, guid: 2683edc62eab5e54999c0956cd06a32a,
     type: 3}
+  turnSpeed: 40
+  speed: 50
+  dragStrength: 0.07
 --- !u!66 &914632140
 CompositeCollider2D:
   m_ObjectHideFlags: 0
@@ -1212,7 +1213,9 @@ MonoBehaviour:
   starPrefab: {fileID: 3794836752380053091, guid: 3f46180a89135c04f820813448d0714f,
     type: 3}
   renderDistance: 2
-  numberOfStars: 10
+  numberOfStars: 5
+  minStars: 0.3
+  maxStars: 0.5
 --- !u!4 &1532423242
 Transform:
   m_ObjectHideFlags: 0

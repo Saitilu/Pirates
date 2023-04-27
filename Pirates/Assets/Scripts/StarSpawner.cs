@@ -9,6 +9,8 @@ public class StarSpawner : MonoBehaviour
     [Header("Adjust")]
     [SerializeField] float renderDistance;
     [SerializeField] int numberOfStars;
+    [SerializeField] float minStars;
+    [SerializeField] float maxStars;
 
     Camera camera;
     float biggestCameraEdge;
@@ -26,7 +28,7 @@ public class StarSpawner : MonoBehaviour
         {
             xPos = Random.Range(-biggestCameraEdge * renderDistance, biggestCameraEdge * renderDistance);
             yPos = Random.Range(-biggestCameraEdge * renderDistance, biggestCameraEdge * renderDistance);
-            scale = Random.Range(.2f, .5f);
+            scale = Random.Range(minStars, maxStars);
             GameObject star = Instantiate(starPrefab, new Vector2(xPos, yPos), Quaternion.identity, transform);
             star.GetComponent<Transform>().localScale = new Vector3(scale, scale, 1);
         }
