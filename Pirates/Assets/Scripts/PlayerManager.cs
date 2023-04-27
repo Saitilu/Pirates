@@ -31,6 +31,9 @@ public class PlayerManager : MonoBehaviour
 
     private void Update()
     {
+        //point the ship
+        transform.rotation = Quaternion.FromToRotation(new Vector3(0, 1, 0), rigidbody.velocity);
+        //shoot
         if (Input.GetKeyDown("space"))
         {
             Transform shooter = transform.Find("Shooter");
@@ -41,12 +44,13 @@ public class PlayerManager : MonoBehaviour
     private void FixedUpdate()
     {
         //turn
-        float turn = -Input.GetAxis("Horizontal") * Time.fixedDeltaTime * turnSpeed;
-        rigidbody.rotation += turn;
+        //float turn = -Input.GetAxis("Horizontal") * Time.fixedDeltaTime * turnSpeed;
+        //rigidbody.rotation += turn;
+        rigidbody.velocity = Quaternion.Euler(0, 0, 40 * -Input.GetAxis("Horizontal") * Time.fixedDeltaTime) * rigidbody.velocity;
 
         //movement force
         float force = Mathf.Max(0, Input.GetAxis("Vertical")) * Time.fixedDeltaTime * speed;
-        rigidbody.AddForce(-transform.up * force);
+        rigidbody.AddForce(transform.up * force);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
