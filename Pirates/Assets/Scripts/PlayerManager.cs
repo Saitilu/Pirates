@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 public class PlayerManager : MonoBehaviour
 {
     public static int maxHealth = 100;
