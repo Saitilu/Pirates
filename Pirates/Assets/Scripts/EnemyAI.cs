@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
-public class PlayerManager : MonoBehaviour
+public class EnemyAI : MonoBehaviour
 {
-    public static int maxHealth = 100;
-    public static int currentHealth;
+    private AIState currentState;
+
     //[SerializeField] Animator anim;
-    [SerializeField] HealthBar healthBar; //reference to the health bar script
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioSource dialogueSource;
     [SerializeField] AudioClip hit;
@@ -24,17 +22,22 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] float speed;
     [SerializeField] float dragStrength;
 
+    [Header("States")]
+    [SerializeField] public TravelState travelState;
+    [SerializeField] public WanderState wanderState;
+
     // Start is called before the first frame update
     void Start()
     {
         rigidbody = GetComponent<Rigidbody2D>();
-
-        currentHealth = maxHealth; //set the current health the max health
-        healthBar.SetMaxHealth(maxHealth); //set the health bars max health through the SetMaxHealth method
+        currentState = new TravelState();
+        currentState.EnterState(this);
     }
 
     private void Update()
     {
+
+
         //point the ship
         transform.rotation = Quaternion.FromToRotation(new Vector3(0, 1, 0), rigidbody.velocity);
         //shoot
@@ -47,13 +50,21 @@ public class PlayerManager : MonoBehaviour
 
     private void FixedUpdate()
     {
+        AIState newState = currentState.Update();
+        //Debug.Log(newState);
+        if (newState != null)
+        {
+            Debug.Log("///////////////////////////////////////////////////////////////////////////////////////////////////");
+            currentState = newState;
+            currentState.EnterState(this);
+        }
         //turn
-        rigidbody.velocity = Quaternion.Euler(0, 0, turnSpeed * -Input.GetAxis("Horizontal") * Time.fixedDeltaTime) * rigidbody.velocity;
+        rigidbody.velocity = Quaternion.Euler(0, 0, turnSpeed * -currentState.horizontal * Time.fixedDeltaTime) * rigidbody.velocity;
         //add drag
         rigidbody.AddForce(-rigidbody.velocity.normalized * rigidbody.velocity.sqrMagnitude * dragStrength);
 
         //movement force
-        float force = Mathf.Max(0, Input.GetAxis("Vertical")) * Time.fixedDeltaTime * speed;
+        float force = (currentState.forward ? 1 : 0) * Time.fixedDeltaTime * speed;
         rigidbody.AddForce(transform.up * force);
     }
 
@@ -62,25 +73,7 @@ public class PlayerManager : MonoBehaviour
         if (collision.gameObject.tag == "Bullet") //if the collision is with a bullet
         {
             Destroy(collision.gameObject);
-            TakeEnemyDamage(5);
-        }
-    }
-
-    public void TakeEnemyDamage(int damage)
-    {
-        //play hit audio
-        audioSource.clip = hit;
-        audioSource.Play();
-
-        //play hit animation
-        //anim.SetTrigger("IsHit");
-        currentHealth -= damage; //damage is taken from health
-
-        healthBar.SetHealth(currentHealth); //set the healthbar health to the current health
-
-        if (currentHealth <= 0) //if health becomes 0
-        {
-            Die(); //call the die function
+            Die();
         }
     }
 
@@ -89,8 +82,24 @@ public class PlayerManager : MonoBehaviour
         //play death audio
         audioSource.clip = death;
         audioSource.Play();
-
-        //load game over scene
-        SceneManager.LoadScene("GAMEOVER");
+        //Die
+        Destroy(gameObject);
     }
+    //public void TakeEnemyDamage(int damage)
+    //{
+    //    //play hit audio
+    //    audioSource.clip = hit;
+    //    audioSource.Play();
+
+    //    //play hit animation
+    //    //anim.SetTrigger("IsHit");
+    //    currentHealth -= damage; //damage is taken from health
+
+    //    healthBar.SetHealth(currentHealth); //set the healthbar health to the current health
+
+    //    if (currentHealth <= 0) //if health becomes 0
+    //    {
+    //        Die(); //call the die function
+    //    }
+    //}
 }
