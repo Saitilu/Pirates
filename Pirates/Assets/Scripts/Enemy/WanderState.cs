@@ -14,7 +14,6 @@ public class WanderState : AIState
         forward = true;
         startRot = parent.transform.up;
         goalAngle = Random.Range(10f, 90f) * (Random.Range(0, 2) == 1 ? -1 : 1);
-        Debug.Log($"Goal Angle: {goalAngle}");
     }
     public override AIState Update()
     {
@@ -25,12 +24,10 @@ public class WanderState : AIState
 
         if (notDone)
         {
-            Debug.Log($"Amount Turned: {amountTurned}  Goal Angle: {goalAngle}   Condition: {notDone}");
             horizontal = -Mathf.Sign(goalAngle);
             return null;
         }
 
-        Debug.Log("Wander done");
         return parent.travelState;
     }
 }

@@ -5,9 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class EnemyAI : MonoBehaviour
 {
-    private AIState currentState;
+    int treasureHoard;
 
-    //[SerializeField] Animator anim;
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioSource dialogueSource;
     [SerializeField] AudioClip hit;
@@ -16,12 +15,14 @@ public class EnemyAI : MonoBehaviour
     Rigidbody2D rigidbody;
 
     [SerializeField] GameObject bulletPrefab;
+    [SerializeField] GameObject treasurePrefab;
 
     [Header("Adjust")]
     [SerializeField] float turnSpeed;
     [SerializeField] float speed;
     [SerializeField] float dragStrength;
 
+    private AIState currentState;
     [Header("States")]
     [SerializeField] public TravelState travelState;
     [SerializeField] public WanderState wanderState;
@@ -29,6 +30,7 @@ public class EnemyAI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        treasureHoard = Random.Range(1, 4);
         rigidbody = GetComponent<Rigidbody2D>();
         currentState = new TravelState();
         currentState.EnterState(this);
@@ -36,16 +38,17 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
-
-
+        
+        //despawn
+        GetComponentInParent<EnemyHandler>().ScrollDespawn(gameObject);
         //point the ship
         transform.rotation = Quaternion.FromToRotation(new Vector3(0, 1, 0), rigidbody.velocity);
         //shoot
-        if (Input.GetKeyDown("space"))
-        {
-            Transform shooter = transform.Find("Shooter");
-            Instantiate(bulletPrefab, shooter.position, transform.rotation * Quaternion.Euler(0, 0, 180));
-        }
+        //if (Input.GetKeyDown("space"))
+        //{
+        //    Transform shooter = transform.Find("Shooter");
+        //    Instantiate(bulletPrefab, shooter.position, transform.rotation * Quaternion.Euler(0, 0, 180));
+        //}
     }
 
     private void FixedUpdate()
@@ -54,7 +57,6 @@ public class EnemyAI : MonoBehaviour
         //Debug.Log(newState);
         if (newState != null)
         {
-            Debug.Log("///////////////////////////////////////////////////////////////////////////////////////////////////");
             currentState = newState;
             currentState.EnterState(this);
         }
@@ -75,6 +77,11 @@ public class EnemyAI : MonoBehaviour
             Destroy(collision.gameObject);
             Die();
         }
+        if (collision.gameObject.tag == "Treasure")
+        {
+            Destroy(collision.gameObject);
+            treasureHoard++;
+        }
     }
 
     void Die()
@@ -82,6 +89,16 @@ public class EnemyAI : MonoBehaviour
         //play death audio
         audioSource.clip = death;
         audioSource.Play();
+
+        GetComponent<Collider2D>().enabled = false;
+        //spawn treasure
+        for (int i = 1; i <= treasureHoard; i++)
+        {
+            float randomAngle = Random.Range(0f, 360f);
+            Vector3 randomDirection = Quaternion.Euler(0, 0, randomAngle) * new Vector3(.02f, 0, 0);
+            Instantiate(treasurePrefab, transform.position + randomDirection, Quaternion.identity);
+        }
+
         //Die
         Destroy(gameObject);
     }

@@ -9,9 +9,17 @@ public class ScoreManager : MonoBehaviour
     public static int score;
     public TextMeshProUGUI UIScore;
 
+    private void Awake()
+    {
+        DontDestroyOnLoad(GameObject.Find("Canvas"));
+    }
     // Update is called once per frame
     void Update()
     {
-        UIScore.text = "SCORE: " + score.ToString(); //display it in the UI text
+        UIScore.text = "Treasure: " + score.ToString(); //display it in the UI text
+    }
+    public void CollectTreasure()
+    {
+        score++;
     }
 }

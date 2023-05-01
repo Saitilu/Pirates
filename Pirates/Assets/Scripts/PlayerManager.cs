@@ -13,6 +13,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] AudioSource dialogueSource;
     [SerializeField] AudioClip hit;
     [SerializeField] AudioClip death;
+    [SerializeField] ScoreManager scoreManager;
 
     Rigidbody2D rigidbody;
 
@@ -22,6 +23,9 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] float turnSpeed;
     [SerializeField] float speed;
     [SerializeField] float dragStrength;
+    [SerializeField] float shotCooldown;
+    float rightShotCooldownTimer = 0;
+    float leftShotCooldownTimer = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -37,10 +41,23 @@ public class PlayerManager : MonoBehaviour
         //point the ship
         transform.rotation = Quaternion.FromToRotation(new Vector3(0, 1, 0), rigidbody.velocity);
         //shoot
-        if (Input.GetKeyDown("space"))
+        rightShotCooldownTimer -= rightShotCooldownTimer > 0 ? Time.deltaTime : 0;
+        leftShotCooldownTimer -= leftShotCooldownTimer > 0 ? Time.deltaTime : 0;
+        if (Input.GetKey(KeyCode.X) && rightShotCooldownTimer <= 0)
         {
-            Transform shooter = transform.Find("Shooter");
-            Instantiate(bulletPrefab, shooter.position, transform.rotation * Quaternion.Euler(0, 0, 180));
+            rightShotCooldownTimer = shotCooldown;
+            Transform shooter = transform.Find("Right Shooter");
+            Rigidbody2D bullet = Instantiate(bulletPrefab, shooter.position, transform.rotation).GetComponent<Rigidbody2D>();
+            bullet.velocity = rigidbody.velocity;
+            bullet.AddForce(transform.rotation * new Vector3(50, 150, 0));
+        }
+        if (Input.GetKey(KeyCode.Z) && leftShotCooldownTimer <= 0)
+        {
+            leftShotCooldownTimer = shotCooldown;
+            Transform shooter = transform.Find("Left Shooter");
+            Rigidbody2D bullet = Instantiate(bulletPrefab, shooter.position, transform.rotation).GetComponent<Rigidbody2D>();
+            bullet.velocity = rigidbody.velocity;
+            bullet.AddForce(transform.rotation * new Vector3(-50, 150, 0));
         }
     }
 
@@ -63,13 +80,20 @@ public class PlayerManager : MonoBehaviour
             Destroy(collision.gameObject);
             TakeEnemyDamage(5);
         }
+        if (collision.gameObject.tag == "Dangerous Object")
+            TakeEnemyDamage(34);
+        if (collision.gameObject.tag == "Treasure")
+        {
+            Destroy(collision.gameObject);
+            scoreManager.CollectTreasure();
+        }
     }
 
     public void TakeEnemyDamage(int damage)
     {
         //play hit audio
-        audioSource.clip = hit;
-        audioSource.Play();
+        //audioSource.clip = hit;
+        //audioSource.Play();
 
         //play hit animation
         //anim.SetTrigger("IsHit");
@@ -79,7 +103,7 @@ public class PlayerManager : MonoBehaviour
 
         if (currentHealth <= 0) //if health becomes 0
         {
-            Die(); //call the die function
+            //Die(); //call the die function
         }
     }
 
@@ -90,6 +114,6 @@ public class PlayerManager : MonoBehaviour
         audioSource.Play();
 
         //load game over scene
-        SceneManager.LoadScene("GAMEOVER");
+        SceneManager.LoadScene("Game Over");
     }
 }

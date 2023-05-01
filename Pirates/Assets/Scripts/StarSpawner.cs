@@ -7,13 +7,13 @@ public class StarSpawner : MonoBehaviour
     [SerializeField] GameObject starPrefab;
 
     [Header("Adjust")]
-    [SerializeField] float renderDistance;
+    static float renderDistance = 2;
     [SerializeField] int numberOfStars;
     [SerializeField] float minStars;
     [SerializeField] float maxStars;
 
     Camera camera;
-    float biggestCameraEdge;
+    float biggestCameraEdge = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +31,28 @@ public class StarSpawner : MonoBehaviour
             scale = Random.Range(minStars, maxStars);
             GameObject star = Instantiate(starPrefab, new Vector2(xPos, yPos), Quaternion.identity, transform);
             star.GetComponent<Transform>().localScale = new Vector3(scale, scale, 1);
+        }
+
+        // move any too close to player
+        Collider2D[] objectsTooCloseToSpawn = Physics2D.OverlapCircleAll(new Vector3(0, 0, 0), 4);
+        int numberOfNonStars = 0;
+        while (objectsTooCloseToSpawn.Length > numberOfNonStars)
+        {
+            numberOfNonStars = 0;
+            foreach (Collider2D collider in objectsTooCloseToSpawn)
+            {
+                if (collider.gameObject.name == "Star(Clone)")
+                {
+                    Destroy(collider.gameObject);
+
+                    xPos = Random.Range(-biggestCameraEdge * renderDistance, biggestCameraEdge * renderDistance);
+                    yPos = Random.Range(-biggestCameraEdge * renderDistance, biggestCameraEdge * renderDistance);
+                    GameObject star = Instantiate(starPrefab, new Vector2(xPos, yPos), Quaternion.identity, transform);
+                }
+                else
+                    numberOfNonStars++;
+            }
+            objectsTooCloseToSpawn = Physics2D.OverlapCircleAll(new Vector3(0, 0, 0), 4);
         }
     }
 

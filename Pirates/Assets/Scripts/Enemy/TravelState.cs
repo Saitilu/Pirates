@@ -7,7 +7,6 @@ public class TravelState : AIState
     float time;
     public override void EnterState(EnemyAI parent)
     {
-        Debug.Log("making Travel");
         this.parent = parent;
         forward = true;
         horizontal = 0;
@@ -15,7 +14,6 @@ public class TravelState : AIState
     }
     public override AIState Update()
     {
-        Debug.Log("Update Travel");
         time -= Time.fixedDeltaTime;
         if (time <= 0)
             return parent.wanderState;

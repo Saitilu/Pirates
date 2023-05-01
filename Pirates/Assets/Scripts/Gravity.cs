@@ -25,12 +25,7 @@ public class Gravity : MonoBehaviour
 
         foreach (Collider2D collider in objectsInRange)
         {
-            float effect;
-            if (collider.gameObject.tag == "Player")
-                effect = Input.GetKey(KeyCode.R) ? -.5f : 1; //take input for player
-            else
-                effect = 1;
-
+            float effect = 1;
             if (collider.gameObject.layer == 6) //if effected by gravity
             {
                 float distance = Mathf.Max(Vector3.Distance(transform.position, collider.transform.position), minValue);
